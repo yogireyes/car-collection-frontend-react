@@ -9,6 +9,7 @@ function LoginPage() {
     const {token, setToken } = useContext(AuthContext)
 
     const [authError, setAuthError] = useState("");
+    const [loading, setLoading] = useState(false);
     const {login} = useAuth()
     const navigate = useNavigate()
     const {
@@ -18,17 +19,20 @@ function LoginPage() {
       } = useForm()
     
       const onSubmit = async(data) => {
-        
+        setAuthError("");
+        setLoading(true)
         try {
             const response = await login(data)
             console.log(response)
             setToken(response.token)
             setAuthError("");
+            setLoading(false)
             toast.success("Successfully logged in.");
             navigate("/dashboard")
             
         } catch (error) {
             // console.log(error)
+            setLoading(false)
             console.log(error.response.data.message)
             setAuthError(error.response.data.message)
         }
@@ -54,10 +58,11 @@ function LoginPage() {
                     <p className='text-danger'>Password is required</p>
                 )}
             </div>
-            
-            <button type="submit" className="btn btn-primary">Submit</button>
+           {loading && <p>Checking</p>}
+           {!loading &&  <button type="submit"  className="btn btn-primary">Submit</button>}
+
         </form>
-                   
+        {authError && <p className='text-danger'>{authError}</p>}         
     </div>
   )
 }
